@@ -124,7 +124,7 @@ export default function Hero() {
       <div className="absolute inset-0">
         <video
           ref={videoRef}
-          className="absolute inset-0 w-full h-full object-cover object-center"
+          className="absolute inset-0 w-full h-full object-cover object-center scale-[0.85]"
           src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260328_115001_bcdaa3b4-03de-47e7-ad63-ae3e392c32d4.mp4"
           muted
           autoPlay
