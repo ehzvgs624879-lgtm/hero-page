@@ -3,13 +3,14 @@ import { Globe, ArrowRight, MessageCircle, Heart } from 'lucide-react';
 
 const FADE_DURATION = 500; // ms
 const FADE_OUT_LEAD = 0.55; // seconds before end to start fading out
-const LOOP_RESET_DELAY = 100; // ms after ended before resetting
+const LOOP_RESET_DELAY = 100; // ms
 
 export default function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const fadingOutRef = useRef(false);
   const fadeAnimRef = useRef<number | null>(null);
+  const prevTimeRef = useRef(0);
 
   const cancelFade = useCallback(() => {
     if (fadeAnimRef.current !== null) {
@@ -67,17 +68,31 @@ export default function Hero() {
 
   const handleTimeUpdate = useCallback(() => {
     const video = videoRef.current;
-    if (!video || !video.duration || fadingOutRef.current) return;
+    if (!video || !video.duration) return;
+
+    // Detect native loop: currentTime jumped backward significantly
+    if (prevTimeRef.current > video.currentTime + FADE_OUT_LEAD + 0.1) {
+      if (fadingOutRef.current) {
+        fadingOutRef.current = false;
+      }
+      // Start fade-in from wherever opacity currently is
+      fadeIn();
+    }
+
     const timeLeft = video.duration - video.currentTime;
-    if (timeLeft <= FADE_OUT_LEAD) {
+    if (timeLeft <= FADE_OUT_LEAD && !fadingOutRef.current) {
       fadeOut();
     }
-  }, [fadeOut]);
+
+    prevTimeRef.current = video.currentTime;
+  }, [fadeIn, fadeOut]);
 
   const handleEnded = useCallback(() => {
+    // Fallback for browsers where native loop doesn't work
     const overlay = overlayRef.current;
     const video = videoRef.current;
     if (overlay) overlay.style.opacity = '0';
+    fadingOutRef.current = false;
     setTimeout(() => {
       if (video) {
         video.currentTime = 0;
@@ -88,8 +103,10 @@ export default function Hero() {
   }, [fadeIn]);
 
   const handlePlay = useCallback(() => {
-    fadingOutRef.current = false;
-    fadeIn();
+    // Only fade in on initial play, not on mid-loop resume
+    if (!fadingOutRef.current) {
+      fadeIn();
+    }
   }, [fadeIn]);
 
   useEffect(() => {
@@ -111,6 +128,8 @@ export default function Hero() {
           muted
           autoPlay
           playsInline
+          loop
+          preload="auto"
           onTimeUpdate={handleTimeUpdate}
           onEnded={handleEnded}
           onPlay={handlePlay}
