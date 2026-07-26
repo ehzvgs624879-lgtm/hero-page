@@ -77,7 +77,6 @@ export default function Hero() {
       if (fadingOutRef.current) {
         fadingOutRef.current = false;
       }
-      // Start fade-in from wherever opacity currently is
       fadeIn();
     }
 
@@ -121,11 +120,11 @@ export default function Hero() {
 
   return (
     <div className="relative min-h-screen bg-black overflow-hidden flex flex-col">
-      {/* Video background with overlay for fade control */}
+      {/* Video background — fills entire viewport, centered composition */}
       <div className="absolute inset-0">
         <video
           ref={videoRef}
-          className="absolute inset-0 w-full h-full object-contain"
+          className="absolute inset-0 w-full h-full object-cover object-center"
           src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260328_115001_bcdaa3b4-03de-47e7-ad63-ae3e392c32d4.mp4"
           muted
           autoPlay
@@ -136,7 +135,7 @@ export default function Hero() {
           onEnded={handleEnded}
           onPlay={handlePlay}
         />
-        {/* Fade overlay — opacity controlled by JS */}
+        {/* Fade overlay — starts black, fades to transparent on play */}
         <div
           ref={overlayRef}
           className="absolute inset-0 bg-black pointer-events-none"
@@ -144,16 +143,13 @@ export default function Hero() {
         />
       </div>
 
-      {/* Navigation */}
+      {/* Navigation — top edge */}
       <nav className="relative z-20 pl-6 pr-6 py-6">
         <div className="rounded-full px-6 py-3 flex items-center justify-between max-w-5xl mx-auto liquid-glass">
-          {/* Left: Logo */}
           <div className="flex items-center gap-2">
             <Globe size={24} className="text-white" />
             <span className="text-white font-semibold text-lg">Asme</span>
           </div>
-
-          {/* Center: Nav links — hidden on mobile */}
           <div className="hidden md:flex items-center gap-8">
             <a href="#" className="text-white/80 hover:text-white transition-colors text-sm font-medium">
               Features
@@ -165,8 +161,6 @@ export default function Hero() {
               About
             </a>
           </div>
-
-          {/* Right: Auth buttons */}
           <div className="flex items-center gap-4">
             <button className="text-white text-sm font-medium">Sign Up</button>
             <button className="liquid-glass rounded-full px-6 py-2 text-white text-sm font-medium">
@@ -176,10 +170,13 @@ export default function Hero() {
         </div>
       </nav>
 
-      {/* Hero content */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-12 text-center -translate-y-[20%]">
+      {/* Spacer — pushes hero content toward the lower portion of the screen */}
+      <div className="flex-1 min-h-[8vh]" />
+
+      {/* Hero content — sits in the lower portion, away from the video's halo center */}
+      <div className="relative z-10 flex flex-col items-center px-6 pb-4 text-center">
         <h1
-          className="text-5xl md:text-6xl lg:text-7xl text-white mb-8 tracking-tight whitespace-nowrap"
+          className="text-5xl md:text-6xl lg:text-7xl text-white mb-6 tracking-tight whitespace-nowrap"
           style={{ fontFamily: "'Instrument Serif', serif" }}
         >
           Built for the curious
@@ -216,8 +213,8 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Social footer */}
-      <div className="relative z-10 flex justify-center gap-4 pb-12">
+      {/* Social footer — bottom edge */}
+      <div className="relative z-10 flex justify-center gap-4 pb-8">
         <button
           className="liquid-glass rounded-full p-4 text-white/80 hover:text-white hover:bg-white/5 transition-all"
           aria-label="Instagram"
