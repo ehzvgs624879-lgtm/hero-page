@@ -19,33 +19,10 @@ export default function Hero() {
     }
   }, []);
 
+  // fadeIn: video becomes visible — overlay goes from black (1) toward transparent (0)
   const fadeIn = useCallback(() => {
     cancelFade();
     fadingOutRef.current = false;
-    const overlay = overlayRef.current;
-    if (!overlay) return;
-    const startTime = performance.now();
-    const startOpacity = parseFloat(overlay.style.opacity) || 0;
-
-    const animate = (now: number) => {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / FADE_DURATION, 1);
-      overlay.style.opacity = String(startOpacity + (1 - startOpacity) * progress);
-      if (progress < 1) {
-        fadeAnimRef.current = requestAnimationFrame(animate);
-      } else {
-        overlay.style.opacity = '1';
-        fadeAnimRef.current = null;
-      }
-    };
-
-    fadeAnimRef.current = requestAnimationFrame(animate);
-  }, [cancelFade]);
-
-  const fadeOut = useCallback(() => {
-    if (fadingOutRef.current) return;
-    fadingOutRef.current = true;
-    cancelFade();
     const overlay = overlayRef.current;
     if (!overlay) return;
     const startTime = performance.now();
@@ -59,6 +36,31 @@ export default function Hero() {
         fadeAnimRef.current = requestAnimationFrame(animate);
       } else {
         overlay.style.opacity = '0';
+        fadeAnimRef.current = null;
+      }
+    };
+
+    fadeAnimRef.current = requestAnimationFrame(animate);
+  }, [cancelFade]);
+
+  // fadeOut: video disappears — overlay goes from transparent (0) toward black (1)
+  const fadeOut = useCallback(() => {
+    if (fadingOutRef.current) return;
+    fadingOutRef.current = true;
+    cancelFade();
+    const overlay = overlayRef.current;
+    if (!overlay) return;
+    const startTime = performance.now();
+    const startOpacity = parseFloat(overlay.style.opacity) || 0;
+
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / FADE_DURATION, 1);
+      overlay.style.opacity = String(startOpacity + (1 - startOpacity) * progress);
+      if (progress < 1) {
+        fadeAnimRef.current = requestAnimationFrame(animate);
+      } else {
+        overlay.style.opacity = '1';
         fadeAnimRef.current = null;
       }
     };
@@ -91,7 +93,7 @@ export default function Hero() {
     // Fallback for browsers where native loop doesn't work
     const overlay = overlayRef.current;
     const video = videoRef.current;
-    if (overlay) overlay.style.opacity = '0';
+    if (overlay) overlay.style.opacity = '1';
     fadingOutRef.current = false;
     setTimeout(() => {
       if (video) {
@@ -138,7 +140,7 @@ export default function Hero() {
         <div
           ref={overlayRef}
           className="absolute inset-0 bg-black pointer-events-none"
-          style={{ opacity: 0 }}
+          style={{ opacity: 1 }}
         />
       </div>
 
